@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mars Rover Rescue - Save Mark Watney</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <div class="title-art">
+                <pre class="ascii-art">
+███╗   ███╗ █████╗ ██████╗ ███████╗
+████╗ ████║██╔══██╗██╔══██╗██╔════╝
+██╔████╔██║███████║██████╔╝███████╗
+██║╚██╔╝██║██╔══██║██╔══██╗╚════██║
+██║ ╚═╝ ██║██║  ██║██║  ██║███████║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+
+██████╗  ██████╗ ██╗   ██╗███████╗██████╗
+██╔══██╗██╔═══██╗██║   ██║██╔════╝██╔══██╗
+██████╔╝██║   ██║██║   ██║█████╗  ██████╔╝
+██╔══██╗██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗
+██║  ██║╚██████╔╝ ╚████╔╝ ███████╗██║  ██║
+╚═╝  ╚═╝ ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝
+
+██████╗ ███████╗███████╗ ██████╗██╗   ██╗███████╗
+██╔══██╗██╔════╝██╔════╝██╔════╝██║   ██║██╔════╝
+██████╔╝█████╗  ███████╗██║     ██║   ██║█████╗
+██╔══██╗██╔══╝  ╚════██║██║     ██║   ██║██╔══╝
+██║  ██║███████╗███████║╚██████╗╚██████╔╝███████╗
+╚═╝  ╚═╝╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚══════╝
+                </pre>
+            </div>
+            <p class="subtitle">A Text-Based RPG for Rover Engineers</p>
+            <p class="subtitle-small">Inspired by "The Martian" by Andy Weir</p>
+            <button class="btn btn-primary pulse" onclick="game.startGame()">BEGIN MISSION</button>
+        </div>
+
+        <!-- Name Entry Screen -->
+        <div id="name-screen" class="screen">
+            <h2>ENGINEER REGISTRATION</h2>
+            <div class="nasa-logo">NASA</div>
+            <p>Welcome to NASA's Jet Propulsion Laboratory.</p>
+            <p>Before we begin, we need your identification.</p>
+            <div class="input-group">
+                <label for="player-name">Enter your engineer name:</label>
+                <input type="text" id="player-name" placeholder="Your name here..." maxlength="20">
+            </div>
+            <button class="btn btn-primary" onclick="game.submitName()">REGISTER</button>
+        </div>
+
+        <!-- Introduction Screen -->
+        <div id="intro-screen" class="screen">
+            <div class="transmission">
+                <div class="transmission-header">
+                    <span class="blink">●</span> CLASSIFIED BRIEFING
+                </div>
+                <div id="intro-text" class="story-text"></div>
+            </div>
+            <button id="intro-continue" class="btn btn-primary hidden" onclick="game.showMissionSelect()">ACCEPT MISSION</button>
+        </div>
+
+        <!-- Mission Select Screen -->
+        <div id="mission-select" class="screen">
+            <h2>MISSION CONTROL</h2>
+            <div id="player-status" class="status-panel"></div>
+            <div class="mission-cards">
+                <div id="mission1-card" class="mission-card" onclick="game.startMission(1)">
+                    <div class="mission-icon">🏠</div>
+                    <h3>Mission 1</h3>
+                    <p class="mission-title">Hab Perimeter Survey</p>
+                    <p class="mission-desc">Lessons 1-2: Sequences & Loops</p>
+                    <div class="mission-status" id="m1-status">AVAILABLE</div>
+                </div>
+                <div id="mission2-card" class="mission-card locked" onclick="game.startMission(2)">
+                    <div class="mission-icon">📡</div>
+                    <h3>Mission 2</h3>
+                    <p class="mission-title">Pathfinder Retrieval</p>
+                    <p class="mission-desc">Lessons 3-5: Conditionals</p>
+                    <div class="mission-status" id="m2-status">LOCKED</div>
+                </div>
+                <div id="mission3-card" class="mission-card locked" onclick="game.startMission(3)">
+                    <div class="mission-icon">🚀</div>
+                    <h3>Mission 3</h3>
+                    <p class="mission-title">Schiaparelli Supply Run</p>
+                    <p class="mission-desc">Lessons 6-8: Full Integration</p>
+                    <div class="mission-status" id="m3-status">LOCKED</div>
+                </div>
+            </div>
+            <div class="mars-fact-box" id="mars-fact-box"></div>
+
+            <div class="mission-select-actions">
+                <button class="btn btn-secondary" onclick="game.showRunHistory()">
+                    📊 View Run History
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="location" id="current-location">📍 NASA JPL</div>
+                <div class="power-display">
+                    <span>🔋</span>
+                    <div class="power-bar">
+                        <div class="power-fill" id="power-fill"></div>
+                    </div>
+                    <span id="power-text">100%</span>
+                </div>
+            </div>
+            <div class="game-content">
+                <div id="story-container" class="story-container">
+                    <div id="story-text" class="story-text"></div>
+                </div>
+                <div id="choices-container" class="choices-container"></div>
+            </div>
+            <div id="coding-challenge" class="coding-challenge hidden">
+                <div class="challenge-header">
+                    <span>💻</span> CODING CHALLENGE
+                </div>
+                <div id="challenge-content"></div>
+                <div id="challenge-options" class="challenge-options"></div>
+                <div id="challenge-feedback" class="challenge-feedback"></div>
+            </div>
+        </div>
+
+        <!-- Mission Complete Screen -->
+        <div id="mission-complete" class="screen">
+            <div class="completion-badge" id="completion-badge">
+                <div class="badge-icon">🏆</div>
+                <h2 id="completion-title">MISSION COMPLETE</h2>
+            </div>
+            <div id="completion-message" class="completion-message"></div>
+            <div id="completion-stats" class="completion-stats"></div>
+            <div class="sphero-connection">
+                <h3>💡 SPHERO CONNECTION</h3>
+                <p id="sphero-tip"></p>
+            </div>
+            <button class="btn btn-primary" onclick="game.returnToMissionSelect()">CONTINUE</button>
+        </div>
+
+        <!-- Sphero Data Entry Screen -->
+        <div id="sphero-data-screen" class="screen">
+            <div id="sphero-data-content" class="sphero-data-content">
+                <!-- Content dynamically generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Run History Screen -->
+        <div id="run-history-screen" class="screen">
+            <div id="run-history-content" class="run-history-content">
+                <!-- Content dynamically generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Game Complete Screen -->
+        <div id="game-complete" class="screen">
+            <div class="victory-container">
+                <h1>🎉 MISSION ACCOMPLISHED 🎉</h1>
+                <div id="watney-message" class="watney-message"></div>
+                <div id="final-stats" class="final-stats"></div>
+                <div class="skills-learned">
+                    <h3>SKILLS YOU DEMONSTRATED:</h3>
+                    <ul>
+                        <li>✓ SEQUENCES - Executing commands in order</li>
+                        <li>✓ LOOPS - Repeating patterns efficiently</li>
+                        <li>✓ CONDITIONALS - Making decisions with IF/THEN</li>
+                        <li>✓ DEBUGGING - Finding and fixing code problems</li>
+                        <li>✓ MEASUREMENTS - Calculating distances and angles</li>
+                    </ul>
+                </div>
+                <div class="final-challenge">
+                    <h3>NOW IT'S YOUR TURN!</h3>
+                    <p>Apply these skills to your REAL Sphero rover!</p>
+                </div>
+                <button class="btn btn-primary" onclick="game.playAgain()">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,1253 @@
+/* Mars Rover Rescue - Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --mars-red: #c1440e;
+    --mars-orange: #e77d11;
+    --mars-dark: #1a0a00;
+    --space-black: #0a0a0f;
+    --nasa-blue: #0b3d91;
+    --terminal-green: #00ff00;
+    --success-green: #2ecc71;
+    --warning-yellow: #f1c40f;
+    --error-red: #e74c3c;
+    --text-light: #ecf0f1;
+    --text-dim: #95a5a6;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background: linear-gradient(135deg, var(--space-black) 0%, #1a1a2e 50%, var(--mars-dark) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Animated stars background */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, white, transparent),
+        radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 230px 80px, white, transparent),
+        radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 350px 200px, white, transparent),
+        radial-gradient(2px 2px at 420px 50px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 500px 180px, white, transparent),
+        radial-gradient(2px 2px at 580px 90px, rgba(255,255,255,0.9), transparent);
+    background-size: 600px 250px;
+    animation: twinkle 8s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Game Container */
+.game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+/* Screens */
+.screen {
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Title Screen */
+#title-screen {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.ascii-art {
+    font-size: 8px;
+    line-height: 1.1;
+    color: var(--mars-orange);
+    text-shadow: 0 0 10px var(--mars-red);
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+@media (min-width: 768px) {
+    .ascii-art {
+        font-size: 10px;
+    }
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin: 10px 0;
+}
+
+.subtitle-small {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+}
+
+/* Buttons */
+.btn {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    border: 2px solid var(--mars-orange);
+    background: transparent;
+    color: var(--mars-orange);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn:hover {
+    background: var(--mars-orange);
+    color: var(--space-black);
+    box-shadow: 0 0 20px var(--mars-orange);
+}
+
+.btn-primary {
+    background: var(--mars-red);
+    color: white;
+    border-color: var(--mars-red);
+}
+
+.btn-primary:hover {
+    background: var(--mars-orange);
+    border-color: var(--mars-orange);
+}
+
+.btn.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 5px var(--mars-red); }
+    50% { box-shadow: 0 0 30px var(--mars-red); }
+}
+
+/* Name Entry Screen */
+#name-screen {
+    text-align: center;
+    padding-top: 60px;
+}
+
+.nasa-logo {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--nasa-blue);
+    background: white;
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 10px;
+    margin: 20px 0 30px;
+}
+
+.input-group {
+    margin: 30px 0;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-dim);
+}
+
+.input-group input {
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    font-family: inherit;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid var(--mars-orange);
+    color: var(--text-light);
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--terminal-green);
+    box-shadow: 0 0 10px var(--terminal-green);
+}
+
+/* Transmission/Story Display */
+.transmission {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--mars-orange);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.transmission-header {
+    color: var(--mars-orange);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.blink {
+    animation: blink 1s infinite;
+    color: var(--error-red);
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.story-text {
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.story-text p {
+    margin-bottom: 15px;
+}
+
+.story-text .highlight {
+    color: var(--mars-orange);
+    font-weight: bold;
+}
+
+.story-text .emphasis {
+    color: var(--terminal-green);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Status Panel */
+.status-panel {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--nasa-blue);
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+}
+
+.status-item {
+    text-align: center;
+}
+
+.status-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+.status-value {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+.status-value.stars {
+    color: var(--warning-yellow);
+}
+
+/* Mission Cards */
+.mission-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.mission-card {
+    background: rgba(0,0,0,0.5);
+    border: 2px solid var(--mars-orange);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mission-card:hover:not(.locked) {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(193, 68, 14, 0.3);
+    border-color: var(--terminal-green);
+}
+
+.mission-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--text-dim);
+}
+
+.mission-card.completed {
+    border-color: var(--success-green);
+}
+
+.mission-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.mission-card h3 {
+    color: var(--mars-orange);
+    margin-bottom: 5px;
+}
+
+.mission-title {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.mission-desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 15px;
+}
+
+.mission-status {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+    background: var(--mars-red);
+}
+
+.mission-card.completed .mission-status {
+    background: var(--success-green);
+}
+
+.mission-card.locked .mission-status {
+    background: var(--text-dim);
+}
+
+/* Mars Fact Box */
+.mars-fact-box {
+    background: rgba(193, 68, 14, 0.2);
+    border-left: 4px solid var(--mars-orange);
+    padding: 15px 20px;
+    margin-top: 20px;
+    font-size: 0.95rem;
+}
+
+.mars-fact-box::before {
+    content: "🔴 MARS FACT: ";
+    font-weight: bold;
+    color: var(--mars-orange);
+}
+
+/* Game Screen */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.location {
+    color: var(--mars-orange);
+    font-weight: bold;
+}
+
+.power-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.power-bar {
+    width: 100px;
+    height: 15px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.power-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--error-red), var(--warning-yellow), var(--success-green));
+    transition: width 0.5s ease;
+    width: 100%;
+}
+
+.game-content {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 400px;
+}
+
+.story-container {
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Choices */
+.choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.choice-btn {
+    padding: 15px 20px;
+    background: rgba(11, 61, 145, 0.3);
+    border: 1px solid var(--nasa-blue);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+.choice-btn:hover {
+    background: var(--nasa-blue);
+    transform: translateX(10px);
+}
+
+.choice-btn .choice-num {
+    color: var(--mars-orange);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Coding Challenge */
+.coding-challenge {
+    background: rgba(0, 50, 0, 0.3);
+    border: 2px solid var(--terminal-green);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.challenge-header {
+    color: var(--terminal-green);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#challenge-content {
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+#challenge-content code {
+    background: rgba(0,0,0,0.5);
+    padding: 2px 8px;
+    border-radius: 3px;
+    color: var(--terminal-green);
+}
+
+#challenge-content pre {
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 10px 0;
+    color: var(--terminal-green);
+}
+
+.challenge-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.challenge-option {
+    padding: 12px 20px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--terminal-green);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: 0.95rem;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.challenge-option:hover {
+    background: rgba(0, 255, 0, 0.2);
+}
+
+.challenge-option.correct {
+    background: rgba(46, 204, 113, 0.3);
+    border-color: var(--success-green);
+}
+
+.challenge-option.incorrect {
+    background: rgba(231, 76, 60, 0.3);
+    border-color: var(--error-red);
+}
+
+.challenge-feedback {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    display: none;
+}
+
+.challenge-feedback.show {
+    display: block;
+}
+
+.challenge-feedback.correct {
+    background: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid var(--success-green);
+}
+
+.challenge-feedback.incorrect {
+    background: rgba(231, 76, 60, 0.2);
+    border-left: 4px solid var(--error-red);
+}
+
+/* Mission Complete */
+#mission-complete {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.completion-badge {
+    margin-bottom: 30px;
+}
+
+.badge-icon {
+    font-size: 5rem;
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.completion-message {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+.completion-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    color: var(--mars-orange);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+.sphero-connection {
+    background: rgba(11, 61, 145, 0.2);
+    border: 1px solid var(--nasa-blue);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 600px;
+}
+
+.sphero-connection h3 {
+    color: var(--nasa-blue);
+    margin-bottom: 10px;
+}
+
+/* Game Complete */
+#game-complete {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.victory-container h1 {
+    color: var(--warning-yellow);
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.watney-message {
+    background: rgba(0,0,0,0.5);
+    border: 2px solid var(--mars-orange);
+    border-radius: 10px;
+    padding: 25px;
+    margin: 30px auto;
+    max-width: 600px;
+    line-height: 1.8;
+    text-align: left;
+}
+
+.watney-message .signature {
+    margin-top: 20px;
+    color: var(--mars-orange);
+    font-style: italic;
+}
+
+.final-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.final-stat {
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 150px;
+}
+
+.final-stat-value {
+    font-size: 1.8rem;
+    color: var(--mars-orange);
+}
+
+.final-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.skills-learned {
+    background: rgba(0, 100, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 500px;
+    text-align: left;
+}
+
+.skills-learned h3 {
+    color: var(--terminal-green);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.skills-learned ul {
+    list-style: none;
+}
+
+.skills-learned li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.final-challenge {
+    background: rgba(193, 68, 14, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 500px;
+}
+
+.final-challenge h3 {
+    color: var(--mars-orange);
+    margin-bottom: 10px;
+}
+
+/* Sphero Data Entry Screen */
+#sphero-data-screen {
+    padding: 20px;
+}
+
+.sphero-data-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.sphero-data-content h2 {
+    color: var(--mars-orange);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.mission-instructions {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--nasa-blue);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.mission-instructions h3 {
+    color: var(--nasa-blue);
+    margin-bottom: 10px;
+}
+
+.mission-instructions p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.mission-requirements {
+    background: rgba(11, 61, 145, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.mission-requirements h4 {
+    color: var(--text-light);
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.mission-requirements ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.mission-requirements li {
+    padding: 5px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.mission-requirements li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--terminal-green);
+}
+
+.math-reminder {
+    background: rgba(193, 68, 14, 0.3);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--mars-orange);
+    margin-top: 15px;
+}
+
+.math-reminder .highlight {
+    color: var(--warning-yellow);
+    font-size: 1.2rem;
+}
+
+.data-entry-form {
+    background: rgba(0, 50, 0, 0.2);
+    border: 1px solid var(--terminal-green);
+    border-radius: 10px;
+    padding: 25px;
+}
+
+.data-entry-form h3 {
+    color: var(--terminal-green);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--text-dim);
+    color: var(--text-light);
+    border-radius: 5px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--terminal-green);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+.form-group input[type="number"] {
+    max-width: 200px;
+}
+
+.form-group select {
+    max-width: 300px;
+    cursor: pointer;
+}
+
+.form-group .hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+/* Inline input with select */
+.form-group input + select {
+    width: auto;
+    max-width: 120px;
+    margin-left: 10px;
+}
+
+/* Unit label for distance fields */
+.form-group .unit-label {
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--mars-orange);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.validation-message {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.validation-message.error {
+    display: block;
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid var(--error-red);
+    color: var(--error-red);
+}
+
+.validation-message.success {
+    display: block;
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid var(--success-green);
+}
+
+.success-message h4 {
+    color: var(--success-green);
+    margin-bottom: 15px;
+}
+
+.success-message p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.success-message .transmitting {
+    color: var(--warning-yellow);
+    animation: pulse-text 1s infinite;
+    margin-top: 15px;
+}
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.data-entry-form .btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 18px;
+    font-size: 1.1rem;
+}
+
+/* Run Data Summary */
+.run-data-summary {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--text-dim);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.run-data-summary h4 {
+    color: var(--mars-orange);
+    margin-bottom: 10px;
+}
+
+.run-data-summary p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.run-data-summary.final {
+    border-color: var(--mars-orange);
+    background: rgba(193, 68, 14, 0.1);
+}
+
+/* Angle Section Styling */
+.angle-section {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid var(--warning-yellow);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.angle-section h4 {
+    color: var(--warning-yellow);
+    margin-bottom: 10px;
+}
+
+.angle-section .angle-intro {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.form-actions .btn {
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--nasa-blue);
+    color: var(--nasa-blue);
+}
+
+.btn-secondary:hover {
+    background: var(--nasa-blue);
+    color: white;
+}
+
+/* Mission Select Actions */
+.mission-select-actions {
+    margin-top: 25px;
+    text-align: center;
+}
+
+/* Run History Screen */
+#run-history-screen {
+    padding: 20px;
+}
+
+.run-history-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.run-history-content h2 {
+    color: var(--mars-orange);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.history-subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    margin-bottom: 25px;
+}
+
+.history-summary {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.summary-stat {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--text-dim);
+    border-radius: 10px;
+    padding: 15px 25px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.summary-stat .stat-num {
+    display: block;
+    font-size: 2rem;
+    color: var(--mars-orange);
+    font-weight: bold;
+}
+
+.summary-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+/* History Tabs */
+.history-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+    border-color: var(--mars-orange);
+    color: var(--mars-orange);
+}
+
+.tab-btn.active {
+    background: var(--mars-orange);
+    border-color: var(--mars-orange);
+    color: white;
+}
+
+/* History Tab Content */
+.history-tab-content {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.no-runs {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+/* History Table */
+.history-table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-table th {
+    background: rgba(11, 61, 145, 0.3);
+    color: var(--text-light);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.history-table td {
+    color: var(--text-light);
+}
+
+.history-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.history-table td.good {
+    color: var(--success-green);
+}
+
+.history-table td.adjust {
+    color: var(--warning-yellow);
+}
+
+/* Comparison Box */
+.comparison-box {
+    background: rgba(11, 61, 145, 0.2);
+    border: 1px solid var(--nasa-blue);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.comparison-box h4 {
+    color: var(--nasa-blue);
+    margin-bottom: 15px;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.compare-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.compare-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+}
+
+.compare-value {
+    display: block;
+    font-size: 1.3rem;
+    color: var(--text-light);
+}
+
+.compare-value.highlight {
+    color: var(--success-green);
+}
+
+/* Angle Analysis */
+.angle-analysis {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid var(--warning-yellow);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.angle-analysis h4 {
+    color: var(--warning-yellow);
+    margin-bottom: 15px;
+}
+
+.angle-analysis p {
+    margin: 8px 0;
+}
+
+.angle-notes {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.angle-notes ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.angle-notes li {
+    padding: 8px 0;
+    font-style: italic;
+    color: var(--text-dim);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* History Actions */
+.history-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.history-actions .btn {
+    min-width: 180px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .ascii-art {
+        font-size: 5px;
+    }
+
+    .status-panel {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .completion-stats, .final-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--mars-orange);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mars-red);
+}
