@@ -50,6 +50,107 @@ chmod +x mars_rover_rpg.py
 ./mars_rover_rpg.py
 ```
 
+### Option 3: Web Version (For iPad/Tablet Access)
+
+The game includes a web version in the `web/` folder that students can access from iPads. **Important:** For iPads to access the web version, it must be served over HTTP (not opened as a file).
+
+#### Option 3A: Cloud Hosting (Recommended for iPad Access)
+
+**Vercel (Easiest):**
+1. Go to [vercel.com](https://vercel.com) and sign up (free)
+2. Click "New Project"
+3. Import your project repository or drag the `web/` folder
+4. Deploy - Vercel will give you a URL like `your-game.vercel.app`
+5. Share the URL with students - they can access it on any iPad with internet
+
+**Updating Your Deployment:**
+- **If connected to Git:** Push changes to your repository → Vercel automatically redeploys
+- **If using drag-and-drop:** You'll need to drag the updated `web/` folder again to redeploy
+- **Tip:** Connecting to Git (GitHub/GitLab) enables automatic updates when you push changes
+
+**Alternative Cloud Hosting:**
+- **Netlify:** Similar to Vercel, drag `web/` folder to [netlify.com](https://netlify.com) - free
+- **GitHub Pages:** If using GitHub, enable Pages in repository settings
+- **Your School's Web Server:** Ask your IT department to host the `web/` folder
+
+#### Option 3B: Local Network Server (For Same-Network Access)
+
+If all iPads are on the same school network as your computer:
+
+1. Navigate to the `web/` folder:
+   ```bash
+   cd mars_rover_rpg/web
+   ```
+
+2. Start a simple HTTP server:
+   ```bash
+   # Python 3
+   python3 -m http.server 8000
+   ```
+
+3. Find your computer's IP address:
+   - Mac/Linux: `ifconfig` or `ipconfig getifaddr en0`
+   - Windows: `ipconfig`
+   
+4. Share the URL: `http://YOUR_IP_ADDRESS:8000` (e.g., `http://192.168.1.100:8000`)
+
+5. Students open this URL in Safari on their iPads
+
+**Note:** The server must stay running while students use it. Stop it with `Ctrl+C`.
+
+**Updating Your Deployment:**
+- **Local Server:** Changes to files in `web/` folder are **immediately visible** - just refresh the browser
+- **Cloud Hosting:** Changes require redeployment (see instructions above for each platform)
+
+## How to Push Updates to Live Version
+
+### Step-by-Step: Update Your Live Game
+
+**If you're using Vercel connected to GitHub (recommended):**
+
+1. **Make your changes** to files in the `web/` folder (or any other files)
+
+2. **Commit your changes:**
+   ```bash
+   cd mars_rover_rpg
+   git add .
+   git commit -m "Update game: [describe your changes]"
+   ```
+
+3. **Push to GitHub:**
+   ```bash
+   git push origin main
+   ```
+
+4. **Vercel automatically deploys** - Usually takes 30-60 seconds. Check your Vercel dashboard to see the deployment status.
+
+5. **Your live URL updates automatically** - Students will see changes on their next visit (or refresh).
+
+**If you haven't set up Vercel yet:**
+
+1. Go to [vercel.com](https://vercel.com) and sign in with your GitHub account
+2. Click "Add New Project"
+3. Import your repository: `ncardet/Mars-Rover-Sphero`
+4. **Important:** Set the "Root Directory" to `web` (or configure it to serve from the `web/` folder)
+5. Click "Deploy"
+6. Vercel will give you a URL - share this with students
+7. From now on, just `git push` and Vercel auto-updates!
+
+**Quick Command Reference:**
+```bash
+# See what files changed
+git status
+
+# Add all changes
+git add .
+
+# Commit with a message
+git commit -m "Your update message here"
+
+# Push to GitHub (triggers Vercel auto-deploy)
+git push origin main
+```
+
 ## Classroom Implementation Suggestions
 
 ### Before Playing

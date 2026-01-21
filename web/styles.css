@@ -1251,3 +1251,22 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--mars-red);
 }
+
+/* Disclaimer */
+.disclaimer {
+    position: fixed;
+    bottom: 10px;
+    right: 15px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    z-index: 100;
+}
+
+.disclaimer a {
+    color: var(--mars-orange);
+    text-decoration: none;
+}
+
+.disclaimer a:hover {
+    text-decoration: underline;
+}
