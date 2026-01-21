@@ -4,6 +4,17 @@
  * Requires actual Sphero programming to complete missions!
  */
 
+// Class configuration for classroom save system
+const CLASS_CONFIG = {
+    classes: [
+        { id: 'class7a', name: '7A' },
+        { id: 'class7b', name: '7B' },
+        { id: 'class7c', name: '7C' }
+    ],
+    groupsPerClass: 8,
+    teacherPassword: 'teacher123'
+};
+
 class MarsRoverGame {
     constructor() {
         this.player = {
@@ -21,12 +32,25 @@ class MarsRoverGame {
             mission3: null
         };
 
-        // Run history (loaded from localStorage)
-        this.runHistory = this.loadRunHistory();
+        // Class-based save system
+        this.currentClass = null;
+        this.currentGroup = null;
+        this.classData = this.loadClassData();
+
+        // Migrate old run history if exists
+        this.migrateOldData();
+
+        // Run history (will be loaded from class data when student selected)
+        this.runHistory = { mission1: [], mission2: [], mission3: [] };
 
         this.currentMission = 0;
         this.currentScene = 0;
         this.typewriterSpeed = 30;
+
+        // Skip functionality
+        this.skipRequested = false;
+        this.pendingText = null;
+        this.pendingElement = null;
 
         this.marsFacts = [
             "Mars is called the Red Planet because iron minerals in the soil oxidize (rust)!",
@@ -50,29 +74,471 @@ class MarsRoverGame {
     }
 
     init() {
-        document.getElementById('player-name').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.submitName();
+        // No longer need player-name listener - using class/student selection
+    }
+
+    // ==================== CLASS DATA MANAGEMENT ====================
+
+    loadClassData() {
+        try {
+            const saved = localStorage.getItem('marsRoverClassData');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // Initialize new class data structure
+            return {
+                version: 1,
+                classes: {}
+            };
+        } catch (e) {
+            console.error('Error loading class data:', e);
+            return { version: 1, classes: {} };
+        }
+    }
+
+    saveClassData() {
+        try {
+            localStorage.setItem('marsRoverClassData', JSON.stringify(this.classData));
+        } catch (e) {
+            console.error('Error saving class data:', e);
+        }
+    }
+
+    migrateOldData() {
+        // Check for old marsRoverRunHistory and migrate to first group slot
+        try {
+            const oldHistory = localStorage.getItem('marsRoverRunHistory');
+            if (oldHistory && !this.classData.migrated) {
+                const history = JSON.parse(oldHistory);
+                if (history.mission1?.length || history.mission2?.length || history.mission3?.length) {
+                    // Migrate to class7a, group 1
+                    if (!this.classData.classes.class7a) {
+                        this.classData.classes.class7a = { groups: {} };
+                    }
+                    this.classData.classes.class7a.groups['1'] = {
+                        player: {
+                            codingSkill: 1,
+                            roverPower: 100,
+                            commsOnline: false,
+                            missionsCompleted: 0
+                        },
+                        runHistory: history,
+                        lastPlayed: new Date().toISOString()
+                    };
+                    this.classData.migrated = true;
+                    this.saveClassData();
+                    console.log('Migrated old run history to 7A, Group 1');
+                }
+            }
+        } catch (e) {
+            console.error('Error migrating old data:', e);
+        }
+    }
+
+    getGroupData(classId, groupNum) {
+        if (!this.classData.classes[classId]) {
+            return null;
+        }
+        return this.classData.classes[classId].groups[groupNum] || null;
+    }
+
+    saveGroupData() {
+        if (!this.currentClass || !this.currentGroup) return;
+
+        if (!this.classData.classes[this.currentClass]) {
+            this.classData.classes[this.currentClass] = { groups: {} };
+        }
+
+        this.classData.classes[this.currentClass].groups[this.currentGroup] = {
+            player: {
+                codingSkill: this.player.codingSkill,
+                roverPower: this.player.roverPower,
+                commsOnline: this.player.commsOnline,
+                missionsCompleted: this.player.missionsCompleted
+            },
+            runHistory: this.runHistory,
+            lastPlayed: new Date().toISOString()
+        };
+
+        this.saveClassData();
+    }
+
+    // ==================== CLASS/GROUP SELECTION ====================
+
+    selectClass(classId) {
+        this.currentClass = classId;
+        this.showScreen('group-select-screen');
+        this.renderGroupGrid();
+    }
+
+    selectGroup(groupNum) {
+        this.currentGroup = groupNum;
+        const groupData = this.getGroupData(this.currentClass, groupNum);
+        const className = CLASS_CONFIG.classes.find(c => c.id === this.currentClass)?.name || '';
+
+        if (groupData) {
+            // Load existing progress
+            this.player = {
+                name: `${className} Group ${groupNum}`,
+                codingSkill: groupData.player.codingSkill || 1,
+                roverPower: groupData.player.roverPower || 100,
+                commsOnline: groupData.player.commsOnline || false,
+                missionsCompleted: groupData.player.missionsCompleted || 0
+            };
+            this.runHistory = groupData.runHistory || { mission1: [], mission2: [], mission3: [] };
+        } else {
+            // New group - reset to defaults
+            this.player = {
+                name: `${className} Group ${groupNum}`,
+                codingSkill: 1,
+                roverPower: 100,
+                commsOnline: false,
+                missionsCompleted: 0
+            };
+            this.runHistory = { mission1: [], mission2: [], mission3: [] };
+        }
+
+        // Save initial data for new groups
+        this.saveGroupData();
+
+        // Check if returning player with completed missions
+        if (this.player.missionsCompleted > 0) {
+            this.showMissionSelect();
+        } else {
+            this.showIntroduction();
+        }
+    }
+
+    renderClassButtons() {
+        const container = document.getElementById('class-buttons-container');
+        container.innerHTML = '';
+
+        CLASS_CONFIG.classes.forEach(cls => {
+            const btn = document.createElement('button');
+            btn.className = 'class-btn';
+
+            // Count groups with saves in this class
+            const classData = this.classData.classes[cls.id];
+            const groupCount = classData ? Object.keys(classData.groups || {}).length : 0;
+
+            btn.innerHTML = `
+                <span class="class-name">Class ${cls.name}</span>
+                <span class="class-groups">${groupCount} group${groupCount !== 1 ? 's' : ''} active</span>
+            `;
+            btn.onclick = () => this.selectClass(cls.id);
+            container.appendChild(btn);
         });
+
+        // Add teacher admin button
+        const adminBtn = document.createElement('button');
+        adminBtn.className = 'btn btn-secondary teacher-admin-btn';
+        adminBtn.innerHTML = 'Teacher Admin';
+        adminBtn.onclick = () => this.showTeacherLogin();
+        container.appendChild(adminBtn);
+    }
+
+    renderGroupGrid() {
+        const container = document.getElementById('group-grid-container');
+        const classLabel = document.getElementById('selected-class-label');
+
+        const className = CLASS_CONFIG.classes.find(c => c.id === this.currentClass)?.name || 'Class';
+        classLabel.textContent = `Class ${className}`;
+
+        container.innerHTML = '';
+
+        for (let i = 1; i <= CLASS_CONFIG.groupsPerClass; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'group-num-btn';
+
+            const groupData = this.getGroupData(this.currentClass, i.toString());
+            if (groupData) {
+                btn.classList.add('has-save');
+                const missions = groupData.player.missionsCompleted || 0;
+                btn.title = `Missions completed: ${missions}/3`;
+            }
+
+            btn.innerHTML = `<span class="group-label">Group</span><span class="group-number">${i}</span>`;
+            btn.onclick = () => this.selectGroup(i.toString());
+            container.appendChild(btn);
+        }
+    }
+
+    backToClassSelect() {
+        this.currentClass = null;
+        this.showScreen('class-select-screen');
+        this.renderClassButtons();
+    }
+
+    // ==================== TEACHER ADMIN PANEL ====================
+
+    showTeacherLogin() {
+        this.showScreen('teacher-login-screen');
+        document.getElementById('teacher-password').value = '';
+        document.getElementById('teacher-login-error').textContent = '';
+        document.getElementById('teacher-password').focus();
+    }
+
+    teacherLogin() {
+        const password = document.getElementById('teacher-password').value;
+        const errorDiv = document.getElementById('teacher-login-error');
+
+        if (password === CLASS_CONFIG.teacherPassword) {
+            this.showAdminOverview();
+        } else {
+            errorDiv.textContent = 'Incorrect password. Please try again.';
+        }
+    }
+
+    showAdminOverview() {
+        this.showScreen('teacher-admin-screen');
+        this.renderAdminOverview();
+    }
+
+    renderAdminOverview() {
+        const container = document.getElementById('admin-content');
+
+        // Calculate stats for each class
+        let classStats = CLASS_CONFIG.classes.map(cls => {
+            const classData = this.classData.classes[cls.id];
+            if (!classData) {
+                return { ...cls, groups: 0, totalMissions: 0, totalRuns: 0 };
+            }
+
+            const groupIds = Object.keys(classData.groups || {});
+            let totalMissions = 0;
+            let totalRuns = 0;
+
+            groupIds.forEach(gid => {
+                const group = classData.groups[gid];
+                totalMissions += group.player?.missionsCompleted || 0;
+                const history = group.runHistory || {};
+                totalRuns += (history.mission1?.length || 0) +
+                            (history.mission2?.length || 0) +
+                            (history.mission3?.length || 0);
+            });
+
+            return {
+                ...cls,
+                groups: groupIds.length,
+                totalMissions,
+                totalRuns
+            };
+        });
+
+        const totalGroups = classStats.reduce((sum, c) => sum + c.groups, 0);
+        const totalMissions = classStats.reduce((sum, c) => sum + c.totalMissions, 0);
+        const totalRuns = classStats.reduce((sum, c) => sum + c.totalRuns, 0);
+
+        container.innerHTML = `
+            <h2>Teacher Admin Panel</h2>
+
+            <div class="admin-summary">
+                <div class="admin-stat">
+                    <span class="stat-num">${totalGroups}</span>
+                    <span class="stat-label">Active Groups</span>
+                </div>
+                <div class="admin-stat">
+                    <span class="stat-num">${totalMissions}</span>
+                    <span class="stat-label">Missions Completed</span>
+                </div>
+                <div class="admin-stat">
+                    <span class="stat-num">${totalRuns}</span>
+                    <span class="stat-label">Sphero Runs</span>
+                </div>
+            </div>
+
+            <h3>Class Overview</h3>
+            <div class="admin-class-list">
+                ${classStats.map(cls => `
+                    <div class="admin-class-item" onclick="game.showClassDetail('${cls.id}')">
+                        <span class="class-name">Class ${cls.name}</span>
+                        <div class="class-stats">
+                            <span>${cls.groups} groups</span>
+                            <span>${cls.totalMissions} missions</span>
+                            <span>${cls.totalRuns} runs</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="admin-actions">
+                <button class="btn btn-primary" onclick="game.exportAllData()">Export All Data (JSON)</button>
+                <button class="btn btn-secondary" onclick="game.exportAllDataCSV()">Export All Data (CSV)</button>
+                <button class="btn btn-danger" onclick="game.confirmResetAll()">Reset All Data</button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="game.backToClassSelect()">Back to Class Selection</button>
+        `;
+    }
+
+    showClassDetail(classId) {
+        const container = document.getElementById('admin-content');
+        const className = CLASS_CONFIG.classes.find(c => c.id === classId)?.name || 'Class';
+        const classData = this.classData.classes[classId];
+
+        if (!classData || Object.keys(classData.groups || {}).length === 0) {
+            container.innerHTML = `
+                <h2>Class ${className} - Details</h2>
+                <p class="no-data">No group data recorded for this class yet.</p>
+                <button class="btn btn-secondary" onclick="game.showAdminOverview()">Back to Overview</button>
+            `;
+            return;
+        }
+
+        const groups = Object.entries(classData.groups).map(([num, data]) => {
+            const history = data.runHistory || {};
+            const runs = (history.mission1?.length || 0) +
+                        (history.mission2?.length || 0) +
+                        (history.mission3?.length || 0);
+            return {
+                num,
+                missions: data.player?.missionsCompleted || 0,
+                skill: data.player?.codingSkill || 1,
+                runs,
+                lastPlayed: data.lastPlayed ? new Date(data.lastPlayed).toLocaleDateString() : '-'
+            };
+        }).sort((a, b) => parseInt(a.num) - parseInt(b.num));
+
+        container.innerHTML = `
+            <h2>Class ${className} - Details</h2>
+
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Group #</th>
+                            <th>Missions</th>
+                            <th>Skill</th>
+                            <th>Runs</th>
+                            <th>Last Played</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${groups.map(g => `
+                            <tr>
+                                <td>${g.num}</td>
+                                <td>${g.missions}/3</td>
+                                <td>${'⭐'.repeat(g.skill)}</td>
+                                <td>${g.runs}</td>
+                                <td>${g.lastPlayed}</td>
+                                <td>
+                                    <button class="btn-small btn-danger" onclick="game.confirmResetGroup('${classId}', '${g.num}')">Reset</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="admin-actions">
+                <button class="btn btn-secondary" onclick="game.exportClassData('${classId}')">Export Class ${className}</button>
+                <button class="btn btn-danger" onclick="game.confirmResetClass('${classId}')">Reset Class ${className}</button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="game.showAdminOverview()">Back to Overview</button>
+        `;
+    }
+
+    exportAllData() {
+        const dataStr = JSON.stringify(this.classData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mars-rover-all-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    exportAllDataCSV() {
+        let csv = 'Class,Group,Missions Completed,Coding Skill,Mission 1 Runs,Mission 2 Runs,Mission 3 Runs,Last Played\n';
+
+        CLASS_CONFIG.classes.forEach(cls => {
+            const classData = this.classData.classes[cls.id];
+            if (classData && classData.groups) {
+                Object.entries(classData.groups).forEach(([num, data]) => {
+                    const history = data.runHistory || {};
+                    csv += `${cls.name},${num},${data.player?.missionsCompleted || 0},${data.player?.codingSkill || 1},${history.mission1?.length || 0},${history.mission2?.length || 0},${history.mission3?.length || 0},${data.lastPlayed || ''}\n`;
+                });
+            }
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mars-rover-all-data-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    exportClassData(classId) {
+        const className = CLASS_CONFIG.classes.find(c => c.id === classId)?.name || classId;
+        const classData = this.classData.classes[classId] || { groups: {} };
+        const dataStr = JSON.stringify({ [classId]: classData }, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mars-rover-class-${className}-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    confirmResetGroup(classId, groupNum) {
+        const className = CLASS_CONFIG.classes.find(c => c.id === classId)?.name || classId;
+        if (confirm(`Are you sure you want to reset Group ${groupNum} in Class ${className}? This cannot be undone.`)) {
+            this.resetGroup(classId, groupNum);
+        }
+    }
+
+    resetGroup(classId, groupNum) {
+        if (this.classData.classes[classId]?.groups[groupNum]) {
+            delete this.classData.classes[classId].groups[groupNum];
+            this.saveClassData();
+            this.showClassDetail(classId);
+        }
+    }
+
+    confirmResetClass(classId) {
+        const className = CLASS_CONFIG.classes.find(c => c.id === classId)?.name || classId;
+        if (confirm(`Are you sure you want to reset ALL data for Class ${className}? This will delete data for ALL groups in this class and cannot be undone.`)) {
+            this.resetClass(classId);
+        }
+    }
+
+    resetClass(classId) {
+        if (this.classData.classes[classId]) {
+            delete this.classData.classes[classId];
+            this.saveClassData();
+            this.showAdminOverview();
+        }
+    }
+
+    confirmResetAll() {
+        if (confirm('Are you sure you want to reset ALL data for ALL classes? This cannot be undone!')) {
+            if (confirm('This will delete all student progress. Type "RESET" in the next prompt to confirm.')) {
+                const confirmation = prompt('Type RESET to confirm:');
+                if (confirmation === 'RESET') {
+                    this.classData = { version: 1, classes: {} };
+                    this.saveClassData();
+                    this.showAdminOverview();
+                }
+            }
+        }
     }
 
     // ==================== RUN HISTORY MANAGEMENT ====================
 
     loadRunHistory() {
-        try {
-            const saved = localStorage.getItem('marsRoverRunHistory');
-            return saved ? JSON.parse(saved) : { mission1: [], mission2: [], mission3: [] };
-        } catch (e) {
-            console.error('Error loading run history:', e);
-            return { mission1: [], mission2: [], mission3: [] };
-        }
+        // Run history is now loaded from class data when student is selected
+        return { mission1: [], mission2: [], mission3: [] };
     }
 
     saveRunHistory() {
-        try {
-            localStorage.setItem('marsRoverRunHistory', JSON.stringify(this.runHistory));
-        } catch (e) {
-            console.error('Error saving run history:', e);
-        }
+        // Save run history as part of student data
+        this.saveGroupData();
     }
 
     addToRunHistory(missionNum, data) {
@@ -80,7 +546,12 @@ class MarsRoverGame {
         data.runNumber = this.runHistory[key].length + 1;
         data.engineerName = this.player.name;
         this.runHistory[key].push(data);
-        this.saveRunHistory();
+        this.saveGroupData();
+    }
+
+    savePlayerProgress() {
+        // Call this after mission completion to persist progress
+        this.saveGroupData();
     }
 
     clearRunHistory() {
@@ -402,56 +873,118 @@ class MarsRoverGame {
         document.getElementById(screenId).classList.add('active');
     }
 
+    // ==================== SKIP FUNCTIONALITY ====================
+
+    showSkipButton() {
+        const skipBtn = document.getElementById('skip-btn');
+        if (skipBtn) {
+            skipBtn.classList.remove('hidden');
+        }
+    }
+
+    hideSkipButton() {
+        const skipBtn = document.getElementById('skip-btn');
+        if (skipBtn) {
+            skipBtn.classList.add('hidden');
+        }
+    }
+
+    skipContent() {
+        this.skipRequested = true;
+        // If we have pending text to display, show it immediately
+        if (this.pendingElement && this.pendingText) {
+            this.pendingElement.innerHTML = this.pendingText;
+        }
+        this.hideSkipButton();
+    }
+
+    canSkipMission(missionNum) {
+        // Allow skipping if the group has already completed this mission
+        return this.player.missionsCompleted >= missionNum;
+    }
+
     // ==================== TYPEWRITER EFFECT ====================
 
     async typewrite(element, text, speed = this.typewriterSpeed) {
         element.innerHTML = '';
+        this.skipRequested = false;
+        this.pendingElement = element;
+        this.pendingText = text;
+        this.showSkipButton();
+
         for (let char of text) {
+            if (this.skipRequested) {
+                element.innerHTML = text;
+                break;
+            }
             element.innerHTML += char;
             await this.sleep(speed);
         }
+
+        this.hideSkipButton();
+        this.pendingElement = null;
+        this.pendingText = null;
     }
 
     async typewriteLines(element, lines, speed = this.typewriterSpeed) {
         element.innerHTML = '';
+        this.skipRequested = false;
+        this.showSkipButton();
+
+        // Store full content for skip
+        const fullContent = lines.map(line => {
+            const cssClass = line.includes('Mark Watney') ? ' class="highlight"' : '';
+            return `<p${cssClass}>${line}</p>`;
+        }).join('');
+        this.pendingElement = element;
+        this.pendingText = fullContent;
+
         for (let line of lines) {
+            if (this.skipRequested) {
+                element.innerHTML = fullContent;
+                break;
+            }
+
             const p = document.createElement('p');
+            if (line.includes('Mark Watney')) {
+                p.classList.add('highlight');
+            }
             element.appendChild(p);
+
             for (let char of line) {
+                if (this.skipRequested) {
+                    element.innerHTML = fullContent;
+                    break;
+                }
                 p.innerHTML += char;
                 await this.sleep(speed);
             }
-            await this.sleep(200);
+            if (!this.skipRequested) {
+                await this.sleep(200);
+            }
         }
+
+        this.hideSkipButton();
+        this.pendingElement = null;
+        this.pendingText = null;
     }
 
     sleep(ms) {
+        if (this.skipRequested) return Promise.resolve();
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // ==================== GAME FLOW ====================
 
     startGame() {
-        this.showScreen('name-screen');
-        document.getElementById('player-name').focus();
-    }
-
-    submitName() {
-        const nameInput = document.getElementById('player-name');
-        const name = nameInput.value.trim();
-
-        if (name.length === 0) {
-            nameInput.style.borderColor = '#e74c3c';
-            nameInput.placeholder = 'Please enter a name!';
-            return;
-        }
-
-        this.player.name = name;
-        this.showIntroduction();
+        // Show class selection instead of name entry
+        this.showScreen('class-select-screen');
+        this.renderClassButtons();
     }
 
     async showIntroduction() {
         this.showScreen('intro-screen');
+        this.skipRequested = false;
 
         const introLines = [
             "YEAR: 2035 | LOCATION: Mars - Acidalia Planitia",
@@ -476,7 +1009,26 @@ class MarsRoverGame {
         const textEl = document.getElementById('intro-text');
         textEl.innerHTML = '';
 
+        // Store full content for skip
+        const fullContent = introLines.map(line => {
+            const cssClass = line.includes('Mark Watney') ? ' class="highlight"' : '';
+            return `<p${cssClass}>${line}</p>`;
+        }).join('');
+        this.pendingElement = textEl;
+        this.pendingText = fullContent;
+
+        // Show skip button in intro screen
+        const introSkipBtn = document.getElementById('intro-skip');
+        if (introSkipBtn) {
+            introSkipBtn.classList.remove('hidden');
+        }
+
         for (let line of introLines) {
+            if (this.skipRequested) {
+                textEl.innerHTML = fullContent;
+                break;
+            }
+
             const p = document.createElement('p');
             if (line.includes('Mark Watney')) {
                 p.classList.add('highlight');
@@ -484,12 +1036,24 @@ class MarsRoverGame {
             textEl.appendChild(p);
 
             for (let char of line) {
+                if (this.skipRequested) {
+                    textEl.innerHTML = fullContent;
+                    break;
+                }
                 p.innerHTML += char;
                 await this.sleep(20);
             }
-            await this.sleep(300);
+            if (!this.skipRequested) {
+                await this.sleep(300);
+            }
         }
 
+        // Hide skip button and show continue
+        if (introSkipBtn) {
+            introSkipBtn.classList.add('hidden');
+        }
+        this.pendingElement = null;
+        this.pendingText = null;
         document.getElementById('intro-continue').classList.remove('hidden');
     }
 
@@ -1116,17 +1680,20 @@ class MarsRoverGame {
     completeMission1WithData() {
         this.player.missionsCompleted = Math.max(this.player.missionsCompleted, 1);
         this.player.roverPower = 85;
+        this.savePlayerProgress();
         this.showMissionComplete(1);
     }
 
     completeMission2WithData() {
         this.player.missionsCompleted = Math.max(this.player.missionsCompleted, 2);
         this.player.commsOnline = true;
+        this.savePlayerProgress();
         this.showMissionComplete(2);
     }
 
     completeMission3WithData() {
         this.player.missionsCompleted = 3;
+        this.savePlayerProgress();
         this.showGameComplete();
     }
 
@@ -1578,6 +2145,18 @@ ELSE move_forward</pre>
                 btn.onclick = () => this.handleChallengeAnswer(index, challenge, resolve);
                 optionsDiv.appendChild(btn);
             });
+
+            // Add skip button if mission was previously completed
+            if (this.canSkipMission(this.currentMission)) {
+                const skipBtn = document.createElement('button');
+                skipBtn.className = 'btn btn-skip challenge-skip';
+                skipBtn.textContent = 'SKIP (Already Completed)';
+                skipBtn.onclick = () => {
+                    challengeDiv.classList.add('hidden');
+                    resolve(true);
+                };
+                optionsDiv.appendChild(skipBtn);
+            }
         });
     }
 
@@ -1798,7 +2377,16 @@ ELSE move_forward</pre>
             mission2: null,
             mission3: null
         };
+        this.runHistory = { mission1: [], mission2: [], mission3: [] };
+        this.savePlayerProgress();
         this.showMissionSelect();
+    }
+
+    // Return to title screen (for logout)
+    logout() {
+        this.currentClass = null;
+        this.currentGroup = null;
+        this.showScreen('title-screen');
     }
 }
 

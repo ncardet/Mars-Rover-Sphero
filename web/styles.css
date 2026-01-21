@@ -1270,3 +1270,394 @@ body {
 .disclaimer a:hover {
     text-decoration: underline;
 }
+
+/* ==================== CLASS-BASED SAVE SYSTEM ==================== */
+
+/* Class Selection Screen */
+#class-select-screen {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.class-selection {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px auto;
+    max-width: 600px;
+}
+
+.class-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 30px;
+    min-width: 150px;
+    background: rgba(11, 61, 145, 0.3);
+    border: 2px solid var(--nasa-blue);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    border-radius: 10px;
+}
+
+.class-btn:hover {
+    background: var(--nasa-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(11, 61, 145, 0.4);
+}
+
+.class-btn .class-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.class-btn .class-groups {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.class-btn:hover .class-groups {
+    color: var(--text-light);
+}
+
+.teacher-admin-btn {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Group Selection Screen */
+#group-select-screen {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.hint-text {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.group-number-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto 30px;
+}
+
+.group-num-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 15px;
+    font-family: inherit;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid var(--text-dim);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.group-num-btn .group-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+.group-num-btn .group-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--mars-orange);
+}
+
+.group-num-btn:hover {
+    background: var(--nasa-blue);
+    border-color: var(--nasa-blue);
+    transform: scale(1.05);
+}
+
+.group-num-btn:hover .group-label,
+.group-num-btn:hover .group-number {
+    color: var(--text-light);
+}
+
+.group-num-btn.has-save {
+    background: rgba(46, 204, 113, 0.3);
+    border-color: var(--success-green);
+}
+
+.group-num-btn.has-save:hover {
+    background: var(--success-green);
+}
+
+/* Teacher Login Screen */
+#teacher-login-screen {
+    text-align: center;
+    padding-top: 60px;
+}
+
+.login-error {
+    color: var(--error-red);
+    margin: 15px 0;
+    min-height: 20px;
+}
+
+.login-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Teacher Admin Panel */
+#teacher-admin-screen {
+    padding: 20px;
+}
+
+.admin-panel {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.admin-panel h2 {
+    color: var(--mars-orange);
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.admin-panel h3 {
+    color: var(--text-light);
+    margin: 25px 0 15px;
+}
+
+.admin-summary {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.admin-stat {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--nasa-blue);
+    border-radius: 10px;
+    padding: 20px 30px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.admin-stat .stat-num {
+    display: block;
+    font-size: 2.5rem;
+    color: var(--mars-orange);
+    font-weight: bold;
+}
+
+.admin-stat .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+.admin-class-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.admin-class-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--text-dim);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-class-item:hover {
+    background: rgba(11, 61, 145, 0.3);
+    border-color: var(--nasa-blue);
+}
+
+.admin-class-item .class-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.admin-class-item .class-stats {
+    display: flex;
+    gap: 20px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+.admin-table-container {
+    overflow-x: auto;
+    margin-bottom: 25px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-table th {
+    background: rgba(11, 61, 145, 0.3);
+    color: var(--text-light);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.admin-table td {
+    color: var(--text-light);
+}
+
+.admin-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger {
+    background: rgba(231, 76, 60, 0.3);
+    border: 1px solid var(--error-red);
+    color: var(--error-red);
+}
+
+.btn-danger:hover {
+    background: var(--error-red);
+    color: white;
+}
+
+/* Skip Button */
+.btn-skip {
+    background: rgba(149, 165, 166, 0.2);
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+.btn-skip:hover {
+    background: rgba(149, 165, 166, 0.4);
+    color: var(--text-light);
+    border-color: var(--text-light);
+    box-shadow: none;
+}
+
+.game-content {
+    position: relative;
+}
+
+/* Challenge skip button positioning */
+.challenge-skip {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* Intro screen buttons */
+.intro-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.intro-buttons .btn-skip {
+    position: relative;
+    bottom: auto;
+    right: auto;
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Mission Select Actions - update for multiple buttons */
+.mission-select-actions {
+    margin-top: 25px;
+    text-align: center;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Responsive adjustments for class system */
+@media (max-width: 600px) {
+    .group-number-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .class-selection {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .class-btn {
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .admin-class-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .admin-class-item .class-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .login-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}

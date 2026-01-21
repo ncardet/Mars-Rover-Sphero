@@ -40,17 +40,50 @@
             <button class="btn btn-primary pulse" onclick="game.startGame()">BEGIN MISSION</button>
         </div>
 
-        <!-- Name Entry Screen -->
-        <div id="name-screen" class="screen">
+        <!-- Class Selection Screen -->
+        <div id="class-select-screen" class="screen">
             <h2>ENGINEER REGISTRATION</h2>
             <div class="nasa-logo">NASA</div>
             <p>Welcome to NASA's Jet Propulsion Laboratory.</p>
-            <p>Before we begin, we need your identification.</p>
-            <div class="input-group">
-                <label for="player-name">Enter your engineer name:</label>
-                <input type="text" id="player-name" placeholder="Your name here..." maxlength="20">
+            <p>Select your class period to begin.</p>
+            <div id="class-buttons-container" class="class-selection">
+                <!-- Class buttons dynamically generated -->
             </div>
-            <button class="btn btn-primary" onclick="game.submitName()">REGISTER</button>
+        </div>
+
+        <!-- Group Selection Screen -->
+        <div id="group-select-screen" class="screen">
+            <h2>SELECT YOUR GROUP</h2>
+            <div class="nasa-logo">NASA</div>
+            <p id="selected-class-label">Class 7A</p>
+            <p class="hint-text">Green groups have saved progress</p>
+            <div id="group-grid-container" class="group-number-grid">
+                <!-- Group buttons dynamically generated -->
+            </div>
+            <button class="btn btn-secondary" onclick="game.backToClassSelect()">Back to Class Selection</button>
+        </div>
+
+        <!-- Teacher Login Screen -->
+        <div id="teacher-login-screen" class="screen">
+            <h2>TEACHER ADMIN LOGIN</h2>
+            <div class="nasa-logo">NASA</div>
+            <p>Enter the teacher password to access the admin panel.</p>
+            <div class="input-group">
+                <label for="teacher-password">Password:</label>
+                <input type="password" id="teacher-password" placeholder="Enter password..." onkeypress="if(event.key === 'Enter') game.teacherLogin()">
+            </div>
+            <div id="teacher-login-error" class="login-error"></div>
+            <div class="login-actions">
+                <button class="btn btn-primary" onclick="game.teacherLogin()">LOGIN</button>
+                <button class="btn btn-secondary" onclick="game.backToClassSelect()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Teacher Admin Screen -->
+        <div id="teacher-admin-screen" class="screen">
+            <div id="admin-content" class="admin-panel">
+                <!-- Admin content dynamically generated -->
+            </div>
         </div>
 
         <!-- Introduction Screen -->
@@ -61,7 +94,10 @@
                 </div>
                 <div id="intro-text" class="story-text"></div>
             </div>
-            <button id="intro-continue" class="btn btn-primary hidden" onclick="game.showMissionSelect()">ACCEPT MISSION</button>
+            <div class="intro-buttons">
+                <button id="intro-skip" class="btn btn-skip hidden" onclick="game.skipContent()">SKIP</button>
+                <button id="intro-continue" class="btn btn-primary hidden" onclick="game.showMissionSelect()">ACCEPT MISSION</button>
+            </div>
         </div>
 
         <!-- Mission Select Screen -->
@@ -97,6 +133,9 @@
                 <button class="btn btn-secondary" onclick="game.showRunHistory()">
                     📊 View Run History
                 </button>
+                <button class="btn btn-secondary" onclick="game.logout()">
+                    Change Group
+                </button>
             </div>
         </div>
 
@@ -117,6 +156,7 @@
                     <div id="story-text" class="story-text"></div>
                 </div>
                 <div id="choices-container" class="choices-container"></div>
+                <button id="skip-btn" class="btn btn-skip hidden" onclick="game.skipContent()">SKIP</button>
             </div>
             <div id="coding-challenge" class="coding-challenge hidden">
                 <div class="challenge-header">
