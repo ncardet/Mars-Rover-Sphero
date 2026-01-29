@@ -1271,6 +1271,55 @@ body {
     text-decoration: underline;
 }
 
+/* ==================== VIDEO SCREEN ==================== */
+
+#video-screen {
+    text-align: center;
+    padding-top: 30px;
+}
+
+#video-screen h2 {
+    color: var(--mars-orange);
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--mars-red);
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 20px;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--mars-orange);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.video-hint {
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+#video-screen .btn {
+    margin: 5px 10px;
+}
+
+#video-screen .btn-secondary {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+}
+
 /* ==================== CLASS-BASED SAVE SYSTEM ==================== */
 
 /* Class Selection Screen */

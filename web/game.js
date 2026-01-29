@@ -977,9 +977,28 @@ class MarsRoverGame {
     // ==================== GAME FLOW ====================
 
     startGame() {
-        // Show class selection instead of name entry
+        // Show intro video first
+        this.showVideoScreen();
+    }
+
+    showVideoScreen() {
+        this.showScreen('video-screen');
+        // Load the YouTube video
+        const iframe = document.getElementById('intro-video');
+        iframe.src = 'https://www.youtube.com/embed/k2Sb7tlMDNs?si=4n-boL-PM9o16jFX';
+    }
+
+    continueFromVideo() {
+        // Stop the video by clearing the src
+        const iframe = document.getElementById('intro-video');
+        iframe.src = '';
+        // Continue to class selection
         this.showScreen('class-select-screen');
         this.renderClassButtons();
+    }
+
+    skipVideo() {
+        this.continueFromVideo();
     }
 
     async showIntroduction() {

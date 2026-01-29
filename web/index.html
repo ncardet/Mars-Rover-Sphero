@@ -40,6 +40,25 @@
             <button class="btn btn-primary pulse" onclick="game.startGame()">BEGIN MISSION</button>
         </div>
 
+        <!-- Video Screen -->
+        <div id="video-screen" class="screen">
+            <h2>MISSION BRIEFING</h2>
+            <div class="video-container">
+                <iframe
+                    id="intro-video"
+                    src=""
+                    title="Mission Briefing Video"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <p class="video-hint">Watch the briefing, then continue to your mission.</p>
+            <button class="btn btn-primary" onclick="game.continueFromVideo()">CONTINUE TO REGISTRATION</button>
+            <button class="btn btn-secondary" onclick="game.skipVideo()">Skip Video</button>
+        </div>
+
         <!-- Class Selection Screen -->
         <div id="class-select-screen" class="screen">
             <h2>ENGINEER REGISTRATION</h2>
